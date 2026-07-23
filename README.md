@@ -1,1 +1,13 @@
 #requirements:
+opencv-python
+ultralytics
+face_recognition
+dlib
+mediapipe
+deep-sort-realtime
+numpy
+scipy
+imutils
+pillow
+python-telegram-bot
+requests
