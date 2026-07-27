@@ -44,4 +44,4 @@ class FaceIdentifier:
             self.known_encodings, encodings[0], tolerance=self.tolerance)
         if True in matches:
             return self.known_names[matches.index(True)]
-        return Non
+        return None
