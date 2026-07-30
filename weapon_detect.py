@@ -1,47 +1,46 @@
-"""Gait recognition fallback for when the face isn't usable (dark, masked,
-side-on). Uses a Gait Energy Image (GEI) matched against registered profiles.
-"""
-import os
+"""Weapon/tool detection near a person's hand using a fine-tuned YOLOv8
+model plus a MediaPipe wrist keypoint proximity check."""
 import numpy as np
+from ultralytics import YOLO
+import mediapipe as mp
+
+TOOL_CLASSES = {"knife", "screwdriver", "crowbar", "hammer", "handgun"}
+PROXIMITY_PX = 60
 
 
-def compute_gei(silhouette_frames):
-    stack = np.stack(silhouette_frames, axis=0).astype(np.float32)
-    return np.mean(stack, axis=0)
+class WeaponDetector:
+    def __init__(self, model_path="weapon_yolov8.pt", conf_threshold=0.5):
+        self.model = YOLO(model_path)
+        self.conf_threshold = conf_threshold
+        self.pose = mp.solutions.pose.Pose(static_image_mode=False)
 
+    def _wrist_points(self, person_crop):
+        result = self.pose.process(person_crop)
+        if not result.pose_landmarks:
+            return []
+        h, w, _ = person_crop.shape
+        lm = result.pose_landmarks.landmark
+        wrists = [lm[mp.solutions.pose.PoseLandmark.LEFT_WRIST],
+                  lm[mp.solutions.pose.PoseLandmark.RIGHT_WRIST]]
+        return [(int(pt.x * w), int(pt.y * h)) for pt in wrists]
 
-class GaitIdentifier:
-    def __init__(self, db_path="data/gait/", similarity_threshold=0.75):
-        self.db_path = db_path
-        self.similarity_threshold = similarity_threshold
-        self.known_geis = {}
-        self._load_known_geis()
-
-    def _load_known_geis(self):
-        if not os.path.isdir(self.db_path):
-            return
-        for fname in os.listdir(self.db_path):
-            if fname.endswith(".npy"):
-                self.known_geis[fname[:-4]] = np.load(os.path.join(self.db_path, fname))
-
-    def register_gait(self, name, silhouette_frames):
-        gei = compute_gei(silhouette_frames)
-        os.makedirs(self.db_path, exist_ok=True)
-        np.save(os.path.join(self.db_path, f"{name}.npy"), gei)
-        self.known_geis[name] = gei
-
-    def identify(self, silhouette_frames):
-        if len(silhouette_frames) < 5:
+    def detect_in_hand(self, frame, person_bbox):
+        x1, y1, x2, y2 = person_bbox
+        person_crop = frame[max(0, y1):y2, max(0, x1):x2]
+        if person_crop.size == 0:
             return None
-        query_gei = compute_gei(silhouette_frames)
-        best_name, best_score = None, -1.0
-        for name, gei in self.known_geis.items():
-            score = _cosine_similarity(query_gei.flatten(), gei.flatten())
-            if score > best_score:
-                best_name, best_score = name, score
-        return best_name if best_score >= self.similarity_threshold else None
-
-
-def _cosine_similarity(a, b):
-    denom = (np.linalg.norm(a) * np.linalg.norm(b)) + 1e-8
-    return float(np.dot(a, b) / denom)
+        wrists = self._wrist_points(person_crop)
+        if not wrists:
+            return None
+        results = self.model(person_crop, verbose=False)[0]
+        for box in results.boxes:
+            cls_name = self.model.names[int(box.cls[0])]
+            conf = float(box.conf[0])
+            if cls_name not in TOOL_CLASSES or conf < self.conf_threshold:
+                continue
+            bx1, by1, bx2, by2 = map(int, box.xyxy[0])
+            center = ((bx1 + bx2) / 2, (by1 + by2) / 2)
+            for wx, wy in wrists:
+                if np.hypot(center[0] - wx, center[1] - wy) <= PROXIMITY_PX:
+                    return cls_name
+        return None
