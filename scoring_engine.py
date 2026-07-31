@@ -8,3 +8,10 @@ from triggering false alerts.
 """
 
 from config import DWELL_TIME_ALERT_SECONDS, SUSPICION_SCORE_THRESHOLD
+
+WEIGHTS = {
+    "unknown_identity": 25,
+    "long_dwell_time": 20,
+    "forced_entry_motion": 25,
+    "weapon_or_tool_detected": 30,
+}
