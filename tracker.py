@@ -38,4 +38,4 @@ class PersonTracker:
                 self.zone_entry_time.pop(track_id, None)
 
             results.append({"track_id": track_id, "bbox": bbox, "dwell_time": dwell_time})
-        return
+        return result
