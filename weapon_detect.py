@@ -1,5 +1,4 @@
-"""Weapon/tool detection near a person's hand using a fine-tuned YOLOv8
-model plus a MediaPipe wrist keypoint proximity check."""
+
 import numpy as np
 from ultralytics import YOLO
 import mediapipe as mp
