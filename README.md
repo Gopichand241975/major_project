@@ -38,3 +38,18 @@ from face_id import FaceIdentifier
 fi = FaceIdentifier()
 fi.register_face("Dad", "photos/dad.jpg")
 ```
+
+## Project status
+Full pipeline implemented (Months 1–4):
+`config → detection → tracker → face_id → gait_id → weapon_detect →
+scoring_engine → alerts → main`
+
+Models used (`yolov8n.pt`, `weapon_yolov8.pt`) still need to be trained /
+fine-tuned on real data before deployment — see the project report's
+Research Papers section for references used in each module's design.
+
+## References
+See `Research_Papers_Download_Links.pdf` for the 9 papers behind this
+system's design (YOLOv8, DeepSORT, FaceNet, Gait Energy Image, BlazePose,
+weapon detection, and smart-home IoT security).
+
