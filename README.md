@@ -31,3 +31,10 @@ crosses the alert threshold.
 pip install -r requirements.txt
 python main.py --camera 0
 ```
+
+Before running, register known family members:
+```python
+from face_id import FaceIdentifier
+fi = FaceIdentifier()
+fi.register_face("Dad", "photos/dad.jpg")
+```
