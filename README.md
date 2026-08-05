@@ -25,3 +25,9 @@ crosses the alert threshold.
 | Scoring Engine | `scoring_engine.py` | Weighted suspicion score combining all signals |
 | Alerts | `alerts.py` | Telegram notification + camera-tamper detection |
 | Entry point | `main.py` | Wires the full pipeline together |
+
+## Setup
+```bash
+pip install -r requirements.txt
+python main.py --camera 0
+```
