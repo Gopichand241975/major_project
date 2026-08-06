@@ -24,3 +24,11 @@ WEIGHTS = {
     "gait_unrecognized": 30,
     "unusual_movement": 40,
 }
+
+# --- Alert channel ---
+TELEGRAM_BOT_TOKEN = "SET_ME"
+TELEGRAM_CHAT_ID = "SET_ME"
+
+# --- Known people database ---
+FACE_DB_PATH = "data/faces/"
+GAIT_DB_PATH = "data/gait/"
