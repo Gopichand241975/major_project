@@ -16,3 +16,11 @@ DARKNESS_BRIGHTNESS_THRESHOLD = 40
 # --- Suspicious behaviour thresholds ---
 UNUSUAL_MOVEMENT_ALERT = True     # e.g. erratic movement / not a normal walking path
 SUSPICION_SCORE_THRESHOLD = 60    # 0-100 scale, triggers alert
+
+
+# --- Scoring weights ---
+WEIGHTS = {
+    "face_unrecognized": 30,
+    "gait_unrecognized": 30,
+    "unusual_movement": 40,
+}
