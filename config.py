@@ -5,3 +5,14 @@ It tries face recognition first; if the face isn't usable (angle, motion,
 or darkness), it falls back to gait recognition. In low light, IR footage
 is used instead of normal color footage for both checks.
 """
+# --- Camera source (indoor camera only) ---
+INDOOR_CAMERA_SOURCE = 0
+
+# --- Lighting detection ---
+# Mean pixel brightness (0-255) below this = treat frame as "dark",
+# switch to IR-based analysis instead of normal color analysis.
+DARKNESS_BRIGHTNESS_THRESHOLD = 40
+
+# --- Suspicious behaviour thresholds ---
+UNUSUAL_MOVEMENT_ALERT = True     # e.g. erratic movement / not a normal walking path
+SUSPICION_SCORE_THRESHOLD = 60    # 0-100 scale, triggers alert
