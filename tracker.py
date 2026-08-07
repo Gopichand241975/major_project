@@ -16,3 +16,13 @@ from collections import deque
 
 import numpy as np
 from deep_sort_realtime.deepsort_tracker import DeepSort
+
+
+HISTORY_LEN = 15
+LINGER_SECONDS = 10
+DIRECTION_REVERSAL_THRESHOLD = 3  # reversals within HISTORY_LEN to flag
+
+
+def _center(bbox):
+    x1, y1, x2, y2 = bbox
+    return ((x1 + x2) / 2, (y1 + y2) / 2)
