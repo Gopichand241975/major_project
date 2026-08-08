@@ -31,3 +31,12 @@ def frame_brightness(frame):
     """Mean grayscale intensity of a frame, 0-255."""
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     return float(gray.mean())
+
+def decide_mode(frame, threshold=DARKNESS_BRIGHTNESS_THRESHOLD):
+    """
+    Returns FACE_MODE or IR_GAIT_MODE for the given frame.
+    """
+    brightness = frame_brightness(frame)
+    if brightness < threshold:
+        return IR_GAIT_MODE
+    return FACE_MODE
