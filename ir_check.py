@@ -19,3 +19,15 @@ in low light. This module only decides which *software* path to run against
 whatever footage is coming in.
 """
 
+import cv2
+
+from config import DARKNESS_BRIGHTNESS_THRESHOLD
+
+FACE_MODE = "face"
+IR_GAIT_MODE = "ir_gait"
+
+
+def frame_brightness(frame):
+    """Mean grayscale intensity of a frame, 0-255."""
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    return float(gray.mean())
