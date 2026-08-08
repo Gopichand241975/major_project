@@ -40,3 +40,40 @@ def decide_mode(frame, threshold=DARKNESS_BRIGHTNESS_THRESHOLD):
     if brightness < threshold:
         return IR_GAIT_MODE
     return FACE_MODE
+
+
+class IRModeMonitor:
+    """
+    Optional smoothing wrapper so the pipeline doesn't flicker between
+    modes on borderline-brightness frames (e.g. a light briefly passing
+    over the camera). Requires N consecutive frames in the new mode
+    before switching.
+    """
+
+    def __init__(self, threshold=DARKNESS_BRIGHTNESS_THRESHOLD, stability_frames=5):
+        self.threshold = threshold
+        self.stability_frames = stability_frames
+        self.current_mode = FACE_MODE
+        self._pending_mode = None
+        self._pending_count = 0
+
+    def update(self, frame):
+        candidate = decide_mode(frame, self.threshold)
+        if candidate == self.current_mode:
+            self._pending_mode = None
+            self._pending_count = 0
+            return self.current_mode
+
+        if candidate == self._pending_mode:
+            self._pending_count += 1
+        else:
+            self._pending_mode = candidate
+            self._pending_count = 1
+
+        if self._pending_count >= self.stability_frames:
+            self.current_mode = candidate
+            self._pending_mode = None
+            self._pending_count = 0
+
+        return self.current_mode
+
